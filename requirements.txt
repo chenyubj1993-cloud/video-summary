@@ -1,0 +1,19 @@
+# 依赖（Windows / Linux 通用）
+# 只跑"转写 + 纠错 + 讲义"这一条链，装这些就够。
+
+yt-dlp>=2025.1
+faster-whisper==1.2.1
+ctranslate2>=4.5
+av>=14
+numpy>=2
+opencc-python-reimplemented>=0.1.7
+Markdown>=3.5
+latex2mathml>=3.77
+pillow>=10
+
+# 画面文字（附录 E、配图）才需要；不装也能跑，frames 会提示缺依赖
+rapidocr-onnxruntime>=1.4
+
+# GPU 加速（可选）：只装 wheel，不需要 CUDA Toolkit，也不需要管理员权限。
+# 装完 cli.py 会自动把这些 DLL 目录加进 PATH（见 vsummary/core.py 的 enable_cuda）。
+#   pip install nvidia-cublas-cu12 nvidia-cudnn-cu12 nvidia-cuda-nvrtc-cu12

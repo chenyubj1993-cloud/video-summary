@@ -1,0 +1,62 @@
+# 冷启动候选：全部是 hyp，不会被 fix 自动应用
+# 规范词	误听形	上下文	状态	证据
+GPT-4V	GPT4		hyp	命中 10 次；P20 156s；相似度 0.8；例：那就是从GPT4当中去间接的偷过来一些输入和输出
+PandaGPT	PanelGPT		hyp	命中 10 次；P28 39s；相似度 0.75；例：我们呢基于这个PanelGPT这样的一个多么太大模型的一个框架
+DINO	Deno		hyp	命中 5 次；P09 65s；相似度 0.75；例：最具有代表性的就是这个Deno
+Embedding	embeding		hyp	命中 4 次；P16 403s；相似度 0.94；例：那我就可以直接把图像映射到这个文本的embeding当中就行
+Vicuna	vikuna		hyp	命中 4 次；P29 43s；相似度 0.83；例：一个是这个vikuna
+ResNet50	lessnets50		hyp	命中 4 次；P05 45s；相似度 0.78；例：我们使用lessnets50作为我们的backbone
+PandaGPT	PanetGPT		hyp	命中 4 次；P29 222s；相似度 0.75；例：我们在我们的这个PanetGPT的这里面呢
+OpenLLaMA	openlama		hyp	命中 3 次；P30 429s；相似度 0.94；例：那么还有一个openlama的参数文件
+PandaGPT	PanGPT		hyp	命中 3 次；P28 581s；相似度 0.86；例：再加上VQ的这个权重才是我们PanGPT它完整的这样的权重
+DINO	info		hyp	命中 3 次；P04 329s；相似度 0.75；例：这个info nce的一个loss
+LoRA	Lola		hyp	命中 3 次；P28 406s；相似度 0.75；例：一个是VQ呢里面额外的一个Lola的一个模块
+YOLO	LOLO		hyp	命中 3 次；P30 846s；相似度 0.75；例：那包括因为他是使用LOLO
+LLaMA	Lama7B		hyp	命中 3 次；P29 480s；相似度 0.73；例：我就存在了这个Lama7B
+Embedding	ebedding		hyp	命中 2 次；P16 385s；相似度 0.94；例：就是说我能够让图像和文本的ebedding
+OpenLLaMA	OpenLAMA		hyp	命中 2 次；P30 788s；相似度 0.94；例：那我们的核心呢是在OpenLAMA的这个文件当中
+PandaGPT	PandaGBT		hyp	命中 2 次；P28 251s；相似度 0.88；例：我们来看一下PandaGBT它怎么做的
+ImageBind	imgbind		hyp	命中 2 次；P32 221s；相似度 0.88；例：我们根据我们imgbind的这样的chippoint
+PyTorch	PyTouch		hyp	命中 2 次；P01 150s；相似度 0.86；例：我希望大家能够熟练使用PyTouch的一个框架
+Vicuna	Vikuna		hyp	命中 2 次；P29 482s；相似度 0.83；例：在这个Vikuna checkpoint下面
+CUB200	COB200		hyp	命中 2 次；P35 260s；相似度 0.83；例：比如说我们下载第一个这个COB200的这样的数据体其实就OK
+Embedding	inbedding		hyp	命中 2 次；P07 60s；相似度 0.78；例：给它转化成一个一个一维的这种inbedding
+PandaGPT	PandertGPT		hyp	命中 2 次；P34 335s；相似度 0.78；例：就是我们这里的这个PandertGPT
+Embedding	embodings		hyp	命中 2 次；P38 457s；相似度 0.78；例：然后的话会经过它的embodings
+BLIP	flip		hyp	命中 2 次；P03 357s；相似度 0.75；例：我们还加了一个flip
+BERT	BEIT		hyp	命中 2 次；P06 64s；相似度 0.75；例：那它的方法也并命名叫BEIT
+CoOp	coco		hyp	命中 2 次；P13 744s；相似度 0.75；例：我没有在coco和这个LVIS的这个数据上训练
+LoRA	lola		hyp	命中 2 次；P30 94s；相似度 0.75；例：基于lola的这个vq呢
+LoRA	LOLA		hyp	命中 2 次；P30 270s；相似度 0.75；例：因为呢他采用的是这个LOLA的这样一个结构
+TorchVision	GPT4Vision		hyp	命中 2 次；P01 280s；相似度 0.67；例：也就是GPT4Vision
+ResNet50	restnet50		hyp	命中 1 次；P09 384s；相似度 0.94；例：这个rn50的话指的就是restnet50嘛
+OpenLLaMA	OpenLama		hyp	命中 1 次；P32 639s；相似度 0.94；例：我们回到我们的这个OpenLama的一个核心的一个网络结构当中来
+ResNet50	reset50		hyp	命中 1 次；P05 103s；相似度 0.93；例：那么刚开始呢我们给它都初始化成reset50的模型就可以
+ResNet50	Reset50		hyp	命中 1 次；P09 363s；相似度 0.93；例：同样是Reset50
+ResNet	RestNet		hyp	命中 1 次；P08 90s；相似度 0.92；例：那在V3的版本当中除了将作为backbone的RestNet替换成VIT之外
+ImageBind	imagefind		hyp	命中 1 次；P32 763s；相似度 0.89；例：也就是说我们如何将我们前面的这个imagefind得到了这个多模态的这个表征啊
+InfoNCE	info1ce		hyp	命中 1 次；P05 624s；相似度 0.86；例：我们对比学习当中不是应该用info1ce loss
+VPT	VIPT		hyp	命中 1 次；P26 520s；相似度 0.86；例：那这个都是我们进入VIPT
+PyTorch	pytouch		hyp	命中 1 次；P29 315s；相似度 0.86；例：一个是这个9.98g的讲究pytouch的model
+Transformer	transforce		hyp	命中 1 次；P38 499s；相似度 0.86；例：然后给他transforce一下
+ImageBind	InvageBind		hyp	命中 1 次；P28 398s；相似度 0.84；例：而这个InvageBind它也是冻结住不被训练的
+Jigsaw	gigsaw		hyp	命中 1 次；P02 342s；相似度 0.83；例：这个gigsaw的意思呢
+ResNet	lesnet		hyp	命中 1 次；P19 141s；相似度 0.83；例：用的是一个不太知名来源的一个lesnet一个网络
+CUB200	cob200		hyp	命中 1 次；P35 576s；相似度 0.83；例：这里的这个cob200的这样的个数据集的话
+ImageNet	Invagenet		hyp	命中 1 次；P09 356s；相似度 0.82；例：它离直接使用Invagenet
+Embedding	imbeding		hyp	命中 1 次；P16 336s；相似度 0.82；例：它的一种平均的这种imbeding
+ResNet50	LensNet50		hyp	命中 1 次；P35 319s；相似度 0.82；例：比如说LensNet50包括ScreenBase
+GPT-4V	gpt4		hyp	命中 1 次；P20 6s；相似度 0.8；例：那它可以呢看成是这个gpt4的开源的平T
+PandaGPT	pandgvt		hyp	命中 1 次；P34 6s；相似度 0.8；例：比如说在这里的话,我给它定义成在这个checkpoint的pandgvt,然后有
+InfoNCE	info1c		hyp	命中 1 次；P05 285s；相似度 0.77；例：那现在的话我们要来定义这个info1c的一个loss
+ResNet	Lessnet		hyp	命中 1 次；P17 15s；相似度 0.77；例：它其实用Lessnet图示和VIT都去做了这个实验
+PyTorch	pythor		hyp	命中 1 次；P31 533s；相似度 0.77；例：这个pythor去进行一个调用
+GPT-4V	GVT4V		hyp	命中 1 次；P14 333s；相似度 0.73；例：特别是GVT4V
+LLaMA	lambda		hyp	命中 1 次；P19 347s；相似度 0.73；例：也就是这个lambda
+LLaMA	lama7b		hyp	命中 1 次；P29 300s；相似度 0.73；例：它的名字呢是这个lama7b
+Transformer	transformation		hyp	命中 1 次；P33 173s；相似度 0.72；例：一个load and transformation data
+CUB200	cub200-2011		hyp	命中 1 次；P35 585s；相似度 0.71；例：比如说我就目前就放在我这个当前这个根目录下面的创建了一个新的文件夹叫做这个cub
+CIFAR-10	CF10		hyp	命中 1 次；P05 39s；相似度 0.67；例：这样的话我们就把这个CF10的这个数据给导入了进来
+ResNet50	rn50		hyp	命中 1 次；P09 384s；相似度 0.67；例：这个rn50的话指的就是restnet50嘛
+CIFAR-10	sipa10数据集		hyp	来自断言冲突 P22 00:13；相似度 0.62；例：
+ImageBind	event bind		hyp	来自断言冲突 P34 03:00；相似度 0.56；例：

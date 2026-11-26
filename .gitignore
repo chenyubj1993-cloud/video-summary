@@ -1,0 +1,37 @@
+# 运行产物（体积大、可重建，绝不入库）
+models/
+out/
+work/
+*.m4a
+*.mp4
+*.wav
+*.mp3
+*.jpg.bak
+
+# 你给的项目专属词表 / 标题覆盖（可选，想共享就删掉下面两行）
+glossary/series/
+out/**/title.txt
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 本地配置与密钥
+.env
+.env.*
+*.key
+secrets.json

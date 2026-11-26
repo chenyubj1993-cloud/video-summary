@@ -1,0 +1,83 @@
+# 领域专名词典（冷启动用）
+# 格式：规范写法 <TAB> 别名（| 分隔，可留空）<TAB> 备注
+# 只放"本来就该这么写"的形式；不要把听错的形式写进来，否则评测等于作弊。
+DINO		Facebook 自监督, 自蒸馏
+MoCo	MoCo v3|MoCov3	动量对比
+CLIP		OpenAI 图文对比
+GLIP		grounded language-image pre-training
+Flamingo		
+LLaVA		visual instruction tuning
+PandaGPT		
+Vicuna		
+LLaMA	LLaMA2|LLaMA-2|Llama	Meta 开源大模型
+OpenLLaMA	Open LLaMA	
+LoRA		low-rank adaptation
+ViT	Vision Transformer|ViT-B|ViT-L|ViT-H	视觉 Transformer
+MAE		masked autoencoder
+SAM	Segment Anything|Segment Anything Model	分割一切
+SimCLR	SimCLRv1|SimCLR v1|SimCLR v2	对比学习
+BYOL		bootstrap your own latent
+SwAV		swapping assignments
+InfoNCE		infoNCE	对比损失
+ResNet50	ResNet-50|Resnet50	残差网络
+ResNet	ResNet18|ResNet34|ResNet101	残差网络
+PyTorch		PyTorch 框架
+TensorFlow		
+TorchVision	Torchvision	PyTorch 视觉库
+Jigsaw		jigsaw puzzle	拼图前置任务
+CIFAR-10	CIFAR10|CIFAR	CIFAR 数据集
+CUB200	CUB-200|CUB	细粒度数据集
+BERT		BERT-base|BERT-large
+GPT-4V	GPT4V|GPT-4-Vision	多模态 GPT-4
+GPT-3	GPT3	
+Transformer		
+Adapter		
+VPT	visual prompt tuning|Visual Prompt Tuning
+IHC		免疫组化
+BCI		Breast Cancer Image|乳腺癌
+ImageNet		
+MLP		multi-layer perceptron
+CNN		
+RNN		
+Embedding	embedding	嵌入
+BatchNorm	batch norm	批归一化
+Inception	Inception-v3
+OpenCV		
+NumPy	numpy
+Pillow	PIL
+PyCharm		
+timm		pytorch-image-models
+scikit-learn	sklearn
+YOLO	YOLOv5|YOLOv8
+U-Net	UNet	医学分割
+GAN		generative adversarial network
+VAE		variational autoencoder
+ALIGN		
+BLIP		BLIP-2
+CoOp		context optimization
+ImageBind		
+Stable Diffusion	StableDiffusion|SD
+Segment Anything		Meta 分割模型
+DeepSpeed		
+LLM		大语言模型
+Vision Transformer		ViT 全称
+# —— 课程里的中文概念（prereq 扫描用；fix 不读这个目录）——
+动量编码器	momentum encoder	MoCo 里用动量更新的 key encoder
+队列	queue	MoCo 的负样本队列，先进先出
+对比学习	contrastive learning	
+自监督学习	self-supervised learning	
+掩码重建	masked image modeling|MIM	MAE/BEiT 的预训练任务
+线性探测	linear probing	只训最后一层分类头
+参数高效微调	parameter-efficient fine-tuning|PEFT	
+提示学习	prompt tuning	
+视觉提示	visual prompt	
+下游任务	downstream task	
+预训练	pre-training	
+知识蒸馏	knowledge distillation	
+温度系数	temperature	
+数据增强	data augmentation	
+注意力	attention	
+残差连接	residual connection	
+表征	representation	
+模态	modality	
+对齐	alignment	
