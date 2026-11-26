@@ -122,6 +122,7 @@ def load_override() -> dict[str, str]:
 
 def build(bv: str, only_defined: bool = True, use_claims: bool = False) -> list[dict]:
     terms = load_terms()
+    overrides = load_override()
     chapters = read_chapters(bv)          # [(标题, 章号, 屏蔽后的正文)]
     cdefs = claims_defs(bv) if use_claims else {}
     rows = []
@@ -155,6 +156,10 @@ def build(bv: str, only_defined: bool = True, use_claims: bool = False) -> list[
             # 否则会出现「jigsaw puzzle」「infoNCE」这种等于没解释的行
             if len(note) >= 4 and (re.search(r"[\u4e00-\u9fff]", note) or len(note) >= 15):
                 defn, src = note, "词表备注"
+        # 人工修订优先于"没定义"：override 里写了一句定义，就不该被 only_defined 过滤掉
+        ovd = overrides.get(key)
+        if ovd:
+            defn, src = ovd, "人工修订"
         if not defn and only_defined:
             continue
         rows.append({"term": info["name"], "def": defn or "—",
