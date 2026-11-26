@@ -80,7 +80,7 @@ def judge(llm: LLM, sent: str, body: str) -> dict:
         return {"verdict": "跳过", "why": raw[:30]}
     v = m.group(1)
     if v not in ("支持", "部分支持", "不支持"):
-        v = "部分支持"
+        v = "跳过"          # 模型答了别的词，别折成"部分支持"把支持率抬高
     return {"verdict": v, "why": m.group(2)[:40]}
 
 
@@ -114,12 +114,16 @@ def run(bv: str, sample: int = 100, only: set[int] | None = None,
     verdict_cn = (f"{n} 条抽样：支持 {cnt['支持']}、部分支持 {cnt['部分支持']}、"
                   f"不支持 {cnt['不支持']}、引用落空 {cnt['无原文']}、跳过 {cnt['跳过']}")
     ok = cnt["支持"] + cnt["部分支持"]
-    rate = ok / max(1, n - cnt["跳过"] - cnt["无原文"])
+    judged = n - cnt["跳过"] - cnt["无原文"]
+    rate = ok / judged if judged else 0.0
+    if judged == 0:
+        verdict_cn += "（可核样本为 0，无法评估——不是「通过」）"
 
     lines = [f"# {bv} 忠实度抽检", "",
              f"{verdict_cn}", "",
-             f"**可核样本里 {ok} 条有原文支持（{rate * 100:.0f}%），"
-             f"{cnt['不支持']} 条找不到支撑。**", "",
+             (f"**可核样本里 {ok} 条有原文支持（{rate * 100:.0f}%），"
+              f"{cnt['不支持']} 条找不到支撑。**" if judged else
+              "**没有可核样本，这一项不算通过也不算失败。**"), "",
              "判定方式：把讲义句子和它引用的转写原句一起交给模型，判 支持/部分支持/不支持。"
              "这只是抽检，不是逐句盖章。", ""]
     bad = [x for x in out if x["verdict"] in ("不支持", "无原文")]

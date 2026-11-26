@@ -296,7 +296,8 @@ def render_md(bv: str, claims: list[dict], rows: list[dict], n_raw: int | None =
                      f"{b['value']} <sub>P{b['page']:02d} {int(b['t'])//60:02d}:{int(b['t'])%60:02d}</sub> | "
                      f"{r['why']} |")
     else:
-        L.append("没有发现矛盾。（也可能只是没抽到——句式覆盖有限。）")
+        L.append(f"没有发现矛盾——从 {len(claims)} 条断言里比出 0 组冲突。"
+                 "断言是机械抽的（是/不是/有 N 个/比…），抽得少时别当成「查过且干净」。")
     return "\n".join(L) + "\n"
 
 
