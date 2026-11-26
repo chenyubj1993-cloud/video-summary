@@ -20,6 +20,7 @@ import sys
 import time
 from pathlib import Path
 
+from vsummary import cite
 from vsummary.core import OUT, WORK, load_segments, video_info
 
 AUDIO_EXT = (".m4a", ".mp3", ".webm", ".aac", ".flac", ".ogg", ".wav")
@@ -148,14 +149,28 @@ def ch_frames(bv: str, ctx: dict) -> tuple[bool, str]:
 def ch_figures(bv: str, ctx: dict) -> tuple[bool, str]:
     d = OUT / bv / "handout"
     chs = sorted(d.glob("ch*.md")) if d.exists() else []
-    if not (OUT / bv / "frames.json").exists():
+    fp = OUT / bv / "frames.json"
+    if not fp.exists():
         return True, "没有抽帧，跳过配图（要图先跑 frames）"
     if not chs:
         return False, "还没有章节"
+    frames = json.loads(fp.read_text(encoding="utf-8"))
+    have = {f.get("page") for f in frames}
     withimg = [f for f in chs if "![图 " in f.read_text(encoding="utf-8")]
-    if len(withimg) < len(chs):
-        return False, f"{len(withimg)}/{len(chs)} 章有图"
     n = sum(f.read_text(encoding="utf-8").count("![图 ") for f in chs)
+    if len(withimg) < len(chs):
+        # 某章引用的分P 一帧都没抽过，那这章本来就没图可用——不算没做完
+        blank = []
+        for f in chs:
+            text = f.read_text(encoding="utf-8")
+            if "![图 " in text:
+                continue
+            pages = {x[0] for x in cite.parse(text)}
+            if pages & have:
+                blank.append(f)
+        if not blank:
+            return True, f"{n} 张图（其余章没有可用画面）"
+        return False, f"{len(withimg)}/{len(chs)} 章有图（{len(blank)} 章有素材但没插上）"
     return True, f"{n} 张图"
 
 
