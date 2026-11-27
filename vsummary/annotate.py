@@ -30,18 +30,42 @@ def load_defs(bv: str) -> dict[str, str]:
             if r.get("def") and r["def"].strip() not in ("", "—")}
 
 
+def _forms(defs: dict[str, str]) -> dict[str, list[str]]:
+    terms = prereq.load_terms()
+    alias_of: dict[str, list[str]] = {}
+    for slot in terms.values():
+        forms = {slot["name"], *slot["aliases"]}
+        for f in forms:
+            alias_of.setdefault(slot["name"].lower(), []).append(f)
+    return alias_of
+
+
+def _strip_text(text: str, defs: dict[str, str], alias_of: dict[str, list[str]]) -> tuple[str, int]:
+    raw = text
+    for term, d in defs.items():
+        forms = set(alias_of.get(term.lower(), [])) | {term}
+        for t in forms:
+            for cand in {t, t.lower(), t.upper(), t.capitalize()}:
+                raw = raw.replace(f"{cand}（{d}）", cand)
+    return raw, text.count("（") - raw.count("（")
+
+
 def strip(bv: str, dry: bool = False) -> int:
-    """把上次插入的 `术语（定义）` 收回去，避免"注解被当成定义"再被采一次。"""
+    """把上次插入的 `术语（定义）` 收回去，避免"注解被当成定义"再被采一次。
+
+    注解可能插在**别名**上（patch embedding（…）而不是 Embedding（…）），
+    也可能大小写与词表不一致，所以按 defs 里的每一对 (别名, 定义) 全量尝试，
+    而不是只认规范词。
+    """
     defs = load_defs(bv)
+    alias_of = _forms(defs)
     n = 0
     for p in sorted((OUT / bv / "handout").glob("ch*.md"),
                     key=lambda x: int(re.sub(r"\D", "", x.stem) or 0)):
-        text = raw = p.read_text(encoding="utf-8")
-        for term, d in defs.items():
-            for t in (term,):
-                raw = raw.replace(f"{t}（{d}）", t)
+        text = p.read_text(encoding="utf-8")
+        raw, cnt = _strip_text(text, defs, alias_of)
         if raw != text:
-            n += text.count("（") - raw.count("（")
+            n += cnt
             if not dry:
                 p.write_text(raw, encoding="utf-8")
     if n:
@@ -53,6 +77,7 @@ def annotate(bv: str, dry: bool = False) -> int:
     defs = load_defs(bv)
     if not dry:
         strip(bv)                        # 先收回上次插入的，保证可重复执行
+    alias_of = _forms(defs)
     terms = prereq.load_terms()          # 规范化：{小写: {name, aliases}}
     aliases: set[str] = set()
     for slot in terms.values():
@@ -60,7 +85,10 @@ def annotate(bv: str, dry: bool = False) -> int:
     chapters = []
     for p in sorted((OUT / bv / "handout").glob("ch*.md"),
                     key=lambda x: int(re.sub(r"\D", "", x.stem) or 0)):
-        chapters.append([p, p.read_text(encoding="utf-8")])
+        text = p.read_text(encoding="utf-8")
+        if dry:                          # 演练：在内存里先收回，否则恒报 0 处
+            text, _ = _strip_text(text, defs, alias_of)
+        chapters.append([p, text])
 
     done: set[str] = set()
     total = 0

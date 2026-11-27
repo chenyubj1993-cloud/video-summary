@@ -25,16 +25,19 @@ CJK = r"\u4e00-\u9fff"
 LEAD = re.compile(r"^(?:但是|所以|那么|然后|因为|而且|就是|其实|这个|那个|我们|大家|"
                   r"这里|那里|现在|接下来|比如说|也就是说|可以说|还有|另外)+")
 TAIL = re.compile(r"(?:的|了|呢|啊|吧|嘛|呀|的话|这个|那个)+$")
+# 主体允许空格（batch size 不能被截成 size），但不许以「不/没/也/都」结尾——
+# 否则「MoCo不是自监督方法」会同时产出「MoCo不」和「MoCo」两个主体，肯定/否定永远打不起来。
+SUBJ = rf"(?P<s>[{CJK}A-Za-z0-9](?:[{CJK}A-Za-z0-9\- ]{{0,18}}?)(?<![不没也都就]))"
 
-DEF = re.compile(rf"(?P<s>[{CJK}A-Za-z0-9\-]{{2,16}}?)"
-                 rf"(?:其实|就|大概|基本上?)?(?:是|指的是|叫做|称为|等于)(?P<v>[^{CJK}，。；！？]*"
-                 rf"[{CJK}A-Za-z0-9\-][^。；！？]{{0,38}})")
-NEG = re.compile(rf"(?P<s>[{CJK}A-Za-z0-9\-]{{2,16}}?)(?:不是|并非|不属于|不等于)"
-                 rf"(?P<v>[^。；！？]{{2,38}})")
-CNT = re.compile(rf"(?P<s>[{CJK}A-Za-z0-9\-]{{2,16}}?)(?:一共|总共)?"
-                 rf"(?:有|包含|分为|分成|用了)(?P<n>\d{{1,4}})\s*(?P<u>个|种|类|层|块|张|步)")
-CMP = re.compile(rf"(?P<s>[{CJK}A-Za-z0-9\-]{{2,16}}?)(?:比|优于|好于|快于|大于|高于)"
+DEF = re.compile(SUBJ + rf"(?:其实|就|大概|基本上?)?(?:是|指的是|叫做|称为|等于)"
+                 rf"(?P<v>[^{CJK}，。；！？]*[{CJK}A-Za-z0-9\-][^。；！？]{{0,38}})")
+NEG = re.compile(SUBJ + r"(?:不是|并非|不属于|不等于)(?P<v>[^。；！？]{2,38})")
+CNT = re.compile(SUBJ + r"(?:一共|总共)?(?:有|包含|分为|分成|用了)"
+                 r"(?P<n>\d{1,4})\s*(?P<u>个|种|类|层|块|张|步)")
+# 比较句的值要截在形容词处：`MoCo比SimCLR快` 的值是 SimCLR，不是「SimCLR快」
+CMP = re.compile(SUBJ + rf"(?:比|优于|好于|快于|大于|高于)"
                  rf"(?P<v>[{CJK}A-Za-z0-9\-]{{2,14}})")
+CMP_CUT = re.compile(r"[好快大高准强低慢小差多]")
 
 KINDS = [("定义", DEF), ("否定", NEG), ("数量", CNT), ("比较", CMP)]
 
@@ -174,6 +177,8 @@ def extract(segs: dict) -> list[dict]:
                 val = clean(m.group("v"), False) if "v" in m.groupdict() else ""
                 if kind == "数量":
                     val = m.group("n") + m.group("u")
+                if kind == "比较" and val:
+                    val = CMP_CUT.split(val)[0].strip()   # SimCLR快 → SimCLR
                 if not subj or len(subj) < 2 or not val:
                     continue
                 if not termish(subj):

@@ -148,15 +148,16 @@ def render(bv0: str, info: dict, eps: list[dict], rows: dict[str, list[dict]],
 
     L += ["## 三、前后不一致", ""]
     if fixed:
-        L += ["| 主体 | 说法 A | 说法 B | 为何可疑 |", "|---|---|---|---|"]
+        L += ["| 主体 | 类型 | 说法 A | 说法 B | 为何可疑 |", "|---|---|---|---|---|"]
         for r in fixed:
             a, b = r["a"], r["b"]
-            L.append(f"| {r['subject']} | {a['value']}（E{a.get('ep', '?')}） "
+            L.append(f"| {r['subject']} | {r.get('kind', '')} "
+                     f"| {a['value']}（E{a.get('ep', '?')}） "
                      f"| {b['value']}（E{b.get('ep', '?')}） | {r.get('why', '')} |")
-        L += ["", "这些是同一主体在两期里被说出两个不同的值。"
+        L += ["", "这些是同一主体、同一类说法在两期里给了不同的值。"
                   "可能是口误，也可能是不同实验的设定——点进去听再判断。"]
     else:
-        L.append("没有发现跨期数值冲突。")
+        L.append("没有发现跨期冲突。")
     L.append("")
     p = base / "series.md"
     p.write_text("\n".join(L), encoding="utf-8")
@@ -207,18 +208,23 @@ def run(bv0: str, llm: LLM, max_eps: int = 5, ids: str = "",
 
     fixed = []
     if len(eps) > 1:
-        by: dict[str, list[dict]] = {}
+        # 按 (kind, subject) 分组：定义和数量混在一起比，会把
+        # 「X 是 A / X 是 B」和「X 有 3 个 / X 有 4 个」当成同一类冲突。
+        by: dict[tuple[str, str], list[dict]] = {}
         for c in all_claims:
-            by.setdefault(c["subject"], []).append(c)
-        for subj, items in by.items():
+            by.setdefault((c["kind"], c["subject"]), []).append(c)
+        for (kind, subj), items in by.items():
             eps_of = {c["ep"] for c in items}
             vals = {c["value"] for c in items}
             if len(eps_of) > 1 and len(vals) > 1:
                 a = items[0]
                 b = next((c for c in items if c["value"] != a["value"]), None)
-                if b:
-                    fixed.append({"subject": subj, "a": a, "b": b,
-                                  "why": "同一主体在两期里给了不同数值"})
+                if not b:
+                    continue
+                if claims_mod.is_change(a["text"], b["text"]):
+                    continue                       # 「原来 64、改成 4」不是矛盾
+                fixed.append({"kind": kind, "subject": subj, "a": a, "b": b,
+                              "why": f"第 {a['ep']} 期与第 {b['ep']} 期给的{kind}不同"})
         fixed = fixed[:20]
 
     p = render(bv0, info, eps, rows, fixed, pages=pages)
