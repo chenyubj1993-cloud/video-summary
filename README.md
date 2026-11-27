@@ -211,7 +211,7 @@ vsummary/
 glossary/              词表：common / ai / series/<bv> / terms/ai（专名词典）/ terms_override
 models/                faster-whisper（自行下载）
 out/<BV号>/            产物
-docs/                  方案总结
+docs/                  技术方案（架构 + review）/ 方案总结（设计取舍）/ 系列化设计稿
 ```
 
 ---
@@ -439,4 +439,8 @@ python cli.py all "https://www.bilibili.com/video/BVxxxxxxx" --dry-run
 
 `run.cmd` 只是 Windows 上省事的包装（设好 UTF-8 / 代理 / 镜像，然后转发给 `cli.py`）：有 `.venv` 就用 `.venv` 里的 python，没有就用 PATH 里的。
 
-设计取舍、每个坑的实测依据、以及各层为什么这么做，见 [`docs/方案总结.md`](docs/方案总结.md)。
+三份文档，按读者分：
+
+- 想 review 架构与取舍：[`docs/技术方案.md`](docs/技术方案.md) —— 链路、数据模型、模块职责、十个关键决策、15 条已知缺陷、按 ROI 排序的优化清单、代码地图
+- 想知道每个坑的实测依据：[`docs/方案总结.md`](docs/方案总结.md) —— 为什么不用平台字幕、为什么弃用 avg_logprob、视觉通道的阈值怎么定的
+- 想把一个合集当成一门课：[`docs/plan-series-course.md`](docs/plan-series-course.md) —— 去重 / 演化 / 修正三件事的设计稿（已实现的 `series` 是第一版）
