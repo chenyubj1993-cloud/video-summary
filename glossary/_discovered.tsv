@@ -58,5 +58,3 @@ Transformer	transformation		hyp	命中 1 次；P33 173s；相似度 0.72；例�
 CUB200	cub200-2011		hyp	命中 1 次；P35 585s；相似度 0.71；例：比如说我就目前就放在我这个当前这个根目录下面的创建了一个新的文件夹叫做这个cub
 CIFAR-10	CF10		hyp	命中 1 次；P05 39s；相似度 0.67；例：这样的话我们就把这个CF10的这个数据给导入了进来
 ResNet50	rn50		hyp	命中 1 次；P09 384s；相似度 0.67；例：这个rn50的话指的就是restnet50嘛
-CIFAR-10	sipa10数据集		hyp	来自断言冲突 P22 00:13；相似度 0.62；例：
-ImageBind	event bind		hyp	来自断言冲突 P34 03:00；相似度 0.56；例：

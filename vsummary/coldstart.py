@@ -22,7 +22,8 @@ from collections import Counter
 
 from .core import GLOSSARY, load_segments, read_lines, seg_text, write_atomic
 
-LEXICON = GLOSSARY / "terms" / "ai.tsv"
+TERMS = GLOSSARY / "terms"          # 一个行业一个文件，全读进来做词典
+LEXICON = TERMS / "ai.tsv"          # 兼容老路径（本机只有 ai.tsv 时也走这里）
 FENCE = re.compile(r"[\u4e00-\u9fff]")
 LATIN = re.compile(r"(?<![A-Za-z])[A-Za-z][A-Za-z0-9\-]{2,}(?![A-Za-z])")
 CONFUSE = str.maketrans({"1": "l", "0": "o", "5": "s", "2": "z", "|": "l"})
@@ -63,20 +64,28 @@ REAL_WORDS = {
 
 
 def load_lexicon() -> tuple[dict[str, str], set[str]]:
-    """返回 (别名→规范词, 全部写法集合)。"""
+    """返回 (别名→规范词, 全部写法集合)。
+
+    词典是 glossary/terms/*.tsv：医学课就用 med.tsv、金融课用 finance.tsv，
+    没有对应文件也不会空转——把现有的一起读，总比只认 ai.tsv 强。
+    """
     alias: dict[str, str] = {}
-    if not LEXICON.exists():
-        return alias, set()
-    for line in read_lines(LEXICON):
-        line = line.strip()
-        if not line or line.startswith("#"):
-            continue
-        c = line.split("\t")
-        canon = c[0].strip()
-        alias[canon.lower()] = canon
-        for a in (c[1].split("|") if len(c) > 1 else []):
-            if a.strip():
-                alias[a.strip().lower()] = canon
+    files = sorted(TERMS.glob("*.tsv")) if TERMS.exists() else []
+    if not files and LEXICON.exists():
+        files = [LEXICON]
+    for path in files:
+        for line in read_lines(path):
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            c = line.split("\t")
+            canon = c[0].strip()
+            if not canon:
+                continue
+            alias[canon.lower()] = canon
+            for a in (c[1].split("|") if len(c) > 1 else []):
+                if a.strip():
+                    alias[a.strip().lower()] = canon
     return alias, set(alias)
 
 
