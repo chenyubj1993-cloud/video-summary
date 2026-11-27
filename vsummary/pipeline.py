@@ -230,11 +230,13 @@ STAGES = [
     ("chapters",   ch_chapters,   True,  ["chapters", "{bv}", "--style", "auto"]),
     ("termsheet",  ch_termsheet,  True,  ["termsheet", "{bv}", "--all"]),
     ("exercises",  ch_exercises,  True,  ["exercises", "{bv}"]),
-    ("figures",    ch_figures,    False, ["figures", "{bv}"]),    # annotate 放最后：它会改每一章正文，放前面会让后面每一步的"产物新旧"判断失效
-    ("annotate",   ch_annotate,   False, ["annotate", "{bv}"]),
-    ("prereq",     ch_prereq,     False, ["prereq", "{bv}"]),
-    ("handout",    ch_handout,    False, ["handout", "{bv}"]),
-    ("gate",       ch_gate,       False, ["gate", "{bv}"]),
+    # 下面五步都吃 LLM 产物（速查表 / 章节正文）：没有 key 时它们没有输入，
+    # 打 True 是为了让 --no-llm 直接跳过，而不是跑起来才发现缺文件。
+    ("figures",    ch_figures,    True,  ["figures", "{bv}"]),    # annotate 放最后：它会改每一章正文，放前面会让后面每一步的"产物新旧"判断失效
+    ("annotate",   ch_annotate,   True,  ["annotate", "{bv}"]),
+    ("prereq",     ch_prereq,     True,  ["prereq", "{bv}"]),
+    ("handout",    ch_handout,    True,  ["handout", "{bv}"]),
+    ("gate",       ch_gate,       True,  ["gate", "{bv}"]),
 ]
 BY_NAME = {s[0]: s for s in STAGES}
 
