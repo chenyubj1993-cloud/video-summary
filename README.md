@@ -23,7 +23,7 @@
 
 左边是讲义正文（111 页，侧边目录、每个论断后面跟着 `[P03 04:12]` 这样的出处，点一下跳回原片那一秒）；右边是精简版（一页地图 + 十条总纲 + 每章六块）。
 
-不用先跑一遍也能看成品：[**Releases**](https://github.com/chenyubj1993-cloud/video-summary/releases) 里放了这台机器跑出来的 `讲义.html`、`讲义.pdf`、`精简版.md`。
+不用先跑一遍也能看成品：[**Releases → v1.0.1**](https://github.com/chenyubj1993-cloud/video-summary/releases/tag/v1.0.1) 里挂了这台机器跑出来的三个文件——`handout.html`（讲义单文件）、`handout.pdf`（A4 打印版，111 页）、`brief.md`（精简版）。
 
 ---
 
