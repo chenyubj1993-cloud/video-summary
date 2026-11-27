@@ -64,7 +64,12 @@ python cli.py all BV1E9U8BBEvZ              :: 开跑
 
 跑完看 `out/BV1E9U8BBEvZ/讲义.html`。
 
-没有 key 也能跑一半：`python cli.py all BV1E9U8BBEvZ --no-llm` 只出转写与纠错稿。
+没有 key 也能跑一半：`python cli.py all <BV> --no-llm` 只出转写、逐P 摘要不生成、不写讲义——
+产出是 `全课转写_已纠错.md`、`changes.md`、`总览.md`（无摘要时为空）、`板书.md`（抽过帧才有）。
+需要讲义的阶段（chapters / handout / gate）会自动跳过，不会报错。
+
+Windows 上也可以直接双击 `run.cmd check` / `run.cmd all BV1E9U8BBEvZ`：脚本会先用 `.venv`
+里的 python，没有再用 PATH 上的。
 
 ### 输入怎么写都行
 
@@ -155,7 +160,11 @@ python cli.py chapters BV号 --api-base http://127.0.0.1:11434/v1 --model qwen2.
 
 ```
 cli.py                 统一入口，只做命令分发
+run.cmd                Windows 包装脚本（优先用 .venv，其次 PATH 里的 python）
 domains.json           10 个行业的特征词与摘要模板
+tests/                 62 例单测（不联网、不碰模型、不需要 key）
+tools/                 一次性小工具（从 板书.md 反重建 frames.json）
+.github/workflows/     CI：两个 OS × 两个 Python 跑单测
 vsummary/
   core.py              路径、B站接口、音频解码、GPU DLL 注入
   transcribe.py        下载 + 转写（GPU 优先，失败回落 CPU；--parts 与旧结果合并）
@@ -314,7 +323,7 @@ python cli.py chapters BV1E9U8BBEvZ --only 3 --force      :: 强制重写第 3 �
 python cli.py test
 ```
 
-33 个用例（两个文件）：`tests/test_core.py` 覆盖输入解析、分章切分、出处解析、掩码、检索排序、门槛判定等纯逻辑；`tests/test_fixes.py` 是回归用例，钉住这一轮修掉的 bug——词表规则的大小写与词边界、`718` 不误伤 `1718`、BOM、`consistency` 除零、`claims` 缺字段不默认保留、附录 slug 全篇唯一、行内代码别当公式、`brief --only` 不丢其它章。几毫秒出结果。
+62 个用例（三个文件）：`tests/test_core.py` 覆盖输入解析、分章切分、出处解析、掩码、检索排序、门槛判定等纯逻辑；`tests/test_fixes.py` 是回归用例，钉住这一轮修掉的 bug——词表规则的大小写与词边界、`718` 不误伤 `1718`、BOM、`consistency` 除零、`claims` 缺字段不默认保留、附录 slug 全篇唯一、行内代码别当公式、`brief --only` 不丢其它章；`tests/test_outputs.py` 覆盖输出层——MathML 渲染、代码块不被当公式、跨章 slug 唯一、`nearest_cite` 只认同分P、`mask` 等长替换、`termsheet` 折叠 `A（A）`。全部离线、几毫秒出结果，CI 里跑（`.github/workflows/tests.yml`，ubuntu + windows × py3.11/3.12，只装 4 个轻依赖）。
 
 ## 只想看代码，不想跑
 
@@ -368,6 +377,24 @@ python cli.py all "https://www.bilibili.com/video/BVxxxxxxx" --dry-run
 
 ---
 
+## 陌生人复现记录（三次全新克隆）
+
+不是"我这台机器上能跑"，是"clone 下来能跑"。三次都是在空目录里 `git clone` → 建 venv → 按 README 走：
+
+| 环境 | 结果 |
+|---|---|
+| 无 GPU 轮子（只装 `requirements.txt`） | `check` 报警「看得到 GPU 但没装运行库，会退回 CPU」；`all` 跑完 **8.1 分钟**、gate 6/6 |
+| 装齐 `nvidia-*` 三个包 | `[model] … on cuda/float16`，**2.1 分钟**跑完（19 分钟的单集视频）、gate 6/6 |
+| 修掉 download 阶段重复加载模型后 | 同一集 **1.2 分钟**，`[model]` 只出现一次 |
+
+过程中修掉的三个"陌生人一定撞上"的问题：
+
+- **GPU 探测误判**：原来用 `ctranslate2.get_cuda_device_count()` 判断——它只数设备、不加载 cublas，于是"看得到卡但没装运行库"时会选 `cuda/float16`，在第一次推理崩掉，报 `Library cublas64_12.dll is not found`。现在改为**真跑 0.6 秒静音**探测，失败自动回落 CPU 并打印装包命令。
+- **模型没下载时报错看不懂**：faster-whisper 会把路径当成模型规格名，抛 `ValueError: Invalid model size 'D:\...\faster-whisper-large-v3-turbo'`。现在先检查目录，缺就列出 `models/` 里现有的、指向 README 第 3 步。
+- **README 的模型下载只给了 `model.bin`**，另外四个文件（`tokenizer.json`/`vocabulary.json`/`config.json`/`preprocessor_config.json`）只说"同目录还要"，而指向的 `docs/方案总结.md` 里并没有那一节——等于断链。现在五个 `curl` 全给。
+
+---
+
 ## 已知局限
 
 - **`avg_logprob` 在干净音频上失效。** 10,800 句里最小 -0.266，没有一句低于 -0.6——VAD 切干净后模型对错误同样自信。所以别指望「低置信句 + LLM 复核」，纠错只能靠词表 + 搭配约束。
@@ -390,6 +417,6 @@ python cli.py all "https://www.bilibili.com/video/BVxxxxxxx" --dry-run
 - 本机若挂着 socks 代理，pip 要加 `--proxy=`，程序内设 `NO_PROXY=*`
 - 体积：turbo 模型约 1.5GB，medium 1.5GB，small 484MB，放 `models/` 下
 
-`run.cmd` 是把本机自带 Python 路径写死的包装脚本，换机器后改里面的 `PY` 那一行即可。
+`run.cmd` 只是 Windows 上省事的包装（设好 UTF-8 / 代理 / 镜像，然后转发给 `cli.py`）：有 `.venv` 就用 `.venv` 里的 python，没有就用 PATH 里的。
 
 设计取舍、每个坑的实测依据、以及各层为什么这么做，见 [`docs/方案总结.md`](docs/方案总结.md)。

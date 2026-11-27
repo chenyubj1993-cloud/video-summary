@@ -192,7 +192,10 @@ def ch_prereq(bv: str, ctx: dict) -> tuple[bool, str]:
 
 def ch_gate(bv: str, ctx: dict) -> tuple[bool, str]:
     p = OUT / bv / "讲义.html"
+    d = OUT / bv / "handout"
     if not p.exists():
+        if not (sorted(d.glob("ch*.md")) if d.exists() else []):
+            return True, "没有讲义（--no-llm 不出），跳过体检"
         return False, "讲义还没生成"
     from . import gate
     rows, code = gate.run(bv)
@@ -204,6 +207,9 @@ def ch_gate(bv: str, ctx: dict) -> tuple[bool, str]:
 
 
 def ch_handout(bv: str, ctx: dict) -> tuple[bool, str]:
+    d = OUT / bv / "handout"
+    if not (sorted(d.glob("ch*.md")) if d.exists() else []):
+        return True, "没有章节正文（--no-llm 不写正文），跳过讲义"
     p = OUT / bv / "讲义.html"
     if not p.exists():
         return False, "没有 讲义.html"
@@ -333,6 +339,11 @@ def main() -> None:
                 plan.append((name, "跳过", "已有完整转写，不必重下"))
                 continue
         if dirty:
+            # 上游刚更新：先问一句"这一步还需不需要做"——不需要就别跟着重跑
+            ok, why = check(bv, ctx)
+            if ok:
+                plan.append((name, "已完成", why))
+                continue
             plan.append((name, "将运行", "上游刚更新"))
             continue
         ok, why = check(bv, ctx)

@@ -102,6 +102,16 @@ def main() -> None:
         return
     print(f"[plan] 待转写 {len(todo)} 个分P", flush=True)
 
+    model_dir = MODELS / args.model
+    if not model_dir.is_dir():
+        have = sorted(p.name for p in MODELS.glob("faster-whisper-*")) if MODELS.exists() else []
+        extra = ("models/ 里现有：" + "、".join(have)) if have else "models/ 目录还是空的"
+        sys.exit(f"[err] 找不到模型目录 {model_dir}\n"
+                 f"      {extra}\n"
+                 f"      下载见 README「30 秒上手」第 3 步——5 个文件都要："
+                 f"model.bin / tokenizer.json / vocabulary.json / config.json / preprocessor_config.json\n"
+                 f"      已经有别的规格，可以指定：--model faster-whisper-small")
+
     enable_cuda()
     from faster_whisper import WhisperModel
     t2s = to_simplified_safe()

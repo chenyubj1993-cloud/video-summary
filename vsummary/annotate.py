@@ -160,6 +160,10 @@ def main() -> None:
     ap.add_argument("bv")
     ap.add_argument("--dry", action="store_true", help="只看会补哪些，不写文件")
     args = ap.parse_args()
+    if not (OUT / args.bv / "termsheet.json").exists():
+        # --no-llm 或没跑过 termsheet 时没有速查表：注解这一步本来就没事可做
+        print(f"[skip] 没有 termsheet.json（先跑 cli.py termsheet {args.bv} --all）；跳过注解")
+        return
     annotate(args.bv, dry=args.dry)
 
 
