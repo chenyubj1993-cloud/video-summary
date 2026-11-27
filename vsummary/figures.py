@@ -29,7 +29,7 @@ import re
 from collections import Counter
 from pathlib import Path
 
-from .core import OUT, fmt
+from .core import OUT, fmt, write_atomic
 
 CITE = re.compile(r"\[P\s*(\d{1,2})[·:：]?\s*(\d{1,2}):(\d{2})\]")
 HEAD = re.compile(r"^#{2,3}\s+(.+)$", re.M)
@@ -187,7 +187,7 @@ def run(bv: str, per_chapter: int = 3, total: int = 18, dry: bool = False) -> di
         if inserts and not dry:
             for pos, block in sorted(inserts, reverse=True):
                 text = text[:pos] + block + text[pos:]
-            path.write_text(text, encoding="utf-8")
+            write_atomic(path, text)
         if inserts:
             print(f"  ch{num}: 插 {len(inserts)} 张")
 

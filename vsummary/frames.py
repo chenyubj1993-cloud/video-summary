@@ -31,7 +31,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .core import OUT, WORK, fmt, load_segments, seg_text
+from .core import OUT, WORK, fmt, load_segments, seg_text, write_atomic
 
 THR = 2.5          # 帧间灰度平均差：实测翻页 3–7、人物微动 0–0.1，取 2.5 较稳
 MIN_GAP = 1.0      # 两次抓帧的最小间隔（秒）
@@ -254,7 +254,7 @@ def write_md(bv: str, frames: list[dict]) -> Path:
             lines.append(body)
             lines.append("```")
             lines.append("")
-    p.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+    write_atomic(p, "\n".join(lines).rstrip() + "\n")
     return p
 
 
@@ -339,7 +339,7 @@ def run(bv: str, pages: list[int] | None = None, no_download: bool = False,
     all_frames = sorted(old + new_frames, key=lambda f: (f["page"], f["t"]))
     attach_context(all_frames, segs["parts"])
     out = OUT / bv / "frames.json"
-    out.write_text(json.dumps(all_frames, ensure_ascii=False, indent=1), encoding="utf-8")
+    write_atomic(out, json.dumps(all_frames, ensure_ascii=False, indent=1))
     md = write_md(bv, all_frames)
     print(f"\n→ 本次 {len(new_frames)} 帧，累计 {len(all_frames)} 帧 → {md}")
     return all_frames

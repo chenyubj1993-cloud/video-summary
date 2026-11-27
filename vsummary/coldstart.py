@@ -20,7 +20,7 @@ import difflib
 import re
 from collections import Counter
 
-from .core import GLOSSARY, load_segments, read_lines, seg_text
+from .core import GLOSSARY, load_segments, read_lines, seg_text, write_atomic
 
 LEXICON = GLOSSARY / "terms" / "ai.tsv"
 FENCE = re.compile(r"[\u4e00-\u9fff]")
@@ -214,7 +214,7 @@ def run(bv: str, fixed: bool = False, write: bool = True) -> tuple[list[dict], i
         lines = [f"{r['good']}\t{r['bad']}\t\thyp\t命中 {r['count']} 次；"
                  f"P{r['page']:02d} {r['t']:.0f}s；相似度 {r['score']}；"
                  f"例：{r['example'][:40]}" for r in rows]
-        p.write_text("\n".join(head + lines) + "\n", encoding="utf-8")
+        write_atomic(p, "\n".join(head + lines) + "\n")
         print(f"→ {p}（{len(rows)} 条候选）")
     return rows, n_tok
 

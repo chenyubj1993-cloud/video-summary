@@ -141,7 +141,17 @@ def main() -> None:
     from vsummary.source import normalize_argv
     rest = normalize_argv([cmd] + rest)[1:]     # 链接 / av 号 / 短链 一律换成 BV
     sys.argv = [f"cli.py {cmd}"] + rest
-    importlib.import_module(CMDS[cmd]).main()
+    from vsummary.llm import LLMError
+
+    try:
+        importlib.import_module(CMDS[cmd]).main()
+    except LLMError as e:
+        # 缺 key / key 过期 / 接口 5xx 都走这里：给一句人话，而不是甩 traceback
+        sys.exit(f"[err] 大模型接口调用失败：{e}\n"
+                 f"      检查 OPENAI_API_KEY 是否有效；换服务用 --api-base / --model。\n"
+                 f"      只想跑本地部分：加 --no-llm（转写、纠错、体检都不需要 key）。")
+    except KeyboardInterrupt:
+        sys.exit("\n[中断] 已生成的部分都在 out/ 里，重跑同一条命令会接着做。")
 
 
 if __name__ == "__main__":

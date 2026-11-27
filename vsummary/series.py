@@ -20,7 +20,7 @@ import re
 from pathlib import Path
 
 from . import claims as claims_mod
-from .core import OUT, api, fmt, link, load_segments, seg_text
+from .core import OUT, api, fmt, link, load_segments, seg_text, write_atomic
 from .llm import LLM, LLMError
 from .source import parse
 
@@ -160,7 +160,7 @@ def render(bv0: str, info: dict, eps: list[dict], rows: dict[str, list[dict]],
         L.append("没有发现跨期冲突。")
     L.append("")
     p = base / "series.md"
-    p.write_text("\n".join(L), encoding="utf-8")
+    write_atomic(p, "\n".join(L))
     return p
 
 

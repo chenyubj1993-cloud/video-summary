@@ -16,7 +16,7 @@ import json
 import re
 from collections import Counter
 
-from .core import GLOSSARY, OUT
+from .core import GLOSSARY, OUT, write_atomic
 from .prereq import load_terms, read_chapters
 
 OVERRIDE = GLOSSARY / "terms_override.tsv"
@@ -248,7 +248,7 @@ def run(bv: str, only_defined: bool = True, use_claims: bool = False,
             rows = [r for r in rows if r["def"] != "—"]
     if write:
         p = OUT / bv / "termsheet.md"
-        p.write_text(render_md(bv, rows, n_terms), encoding="utf-8")
+        write_atomic(p, render_md(bv, rows, n_terms))
         (OUT / bv / "termsheet.json").write_text(
             json.dumps(rows, ensure_ascii=False, indent=1), encoding="utf-8")
         miss = sum(1 for r in rows if r["def"] == "—")

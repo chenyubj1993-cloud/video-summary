@@ -16,7 +16,7 @@ from __future__ import annotations
 import argparse
 import re
 
-from .core import GLOSSARY, OUT, read_lines
+from .core import GLOSSARY, OUT, read_lines, write_atomic
 
 CODE = re.compile(r"```.*?```", re.S)
 CITE = re.compile(r"\[P\s*\d{1,2}[^\]]*\]")
@@ -285,7 +285,7 @@ def run(bv: str, write: bool = True, show_all: bool = False) -> list[dict]:
     rows = scan(bv)
     if write:
         p = OUT / bv / "prereq.md"
-        p.write_text(render_md(bv, rows, show_all), encoding="utf-8")
+        write_atomic(p, render_md(bv, rows, show_all))
         print(f"→ {p}")
     return rows
 

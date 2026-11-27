@@ -184,7 +184,7 @@ def render(bv: str, md: str, title: str) -> str:
 <style>main h1{{font-size:26px}}.wrap{{display:block;max-width:820px;margin:0 auto;padding:28px 22px}}</style>
 </head><body><div class="wrap"><main>{body}</main></div></body></html>"""
     p = OUT / bv / "精简版.html"
-    p.write_text(html, encoding="utf-8")
+    write_atomic(p, html)
     print(f"→ {p}（{len(html) // 1024} KB）")
     return html
 

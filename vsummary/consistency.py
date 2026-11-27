@@ -16,7 +16,7 @@ from collections import defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from .core import OUT, fmt, link, load_segments, seg_text
+from .core import OUT, fmt, link, load_segments, seg_text, write_atomic
 
 # ---------------------------------------------------------------- 抽取规则
 # (属性名, 正则, 取值组号, 是否低基数属性)
@@ -248,7 +248,7 @@ def run(bv: str, write: bool = True) -> tuple[Path, list[dict]]:
     md = render_md(bv, rows, len(facts), n_segs)
     p = OUT / bv / "consistency.md"
     if write:
-        p.write_text(md, encoding="utf-8")
+        write_atomic(p, md)
         (OUT / bv / "consistency.json").write_text(
             json.dumps({"facts": [asdict(f) for f in facts], "conflicts": rows},
                        ensure_ascii=False, indent=1), encoding="utf-8")

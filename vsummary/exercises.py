@@ -20,7 +20,7 @@ import argparse
 import re
 
 from . import cite
-from .core import OUT
+from .core import OUT, write_atomic
 from .llm import LLM
 
 SYS = """你是这门课的助教，负责出**自测题**，帮读者检查自己是不是真读懂了。
@@ -127,7 +127,7 @@ def run(bv: str, llm: LLM, per_chapter: int = 4, only: set[int] | None = None,
                 text = text.replace("## 存疑与勘误", block + "\n## 存疑与勘误", 1)
             else:
                 text = text.rstrip() + "\n\n" + block + "\n"
-            path.write_text(text, encoding="utf-8")
+            write_atomic(path, text)
         total += len(pairs)
         print(f"  ch{n}: {len(pairs)} 题，{ok}/{tot} 个答案找得到出处", flush=True)
     print(f"\n共 {total} 题{'（演练，未写入）' if dry else ''}")

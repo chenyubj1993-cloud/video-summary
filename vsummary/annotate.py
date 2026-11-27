@@ -16,7 +16,7 @@ import json
 import re
 
 from . import prereq
-from .core import OUT
+from .core import OUT, write_atomic
 
 MAXLEN = 46          # 太长的注解反而打断阅读
 
@@ -67,7 +67,7 @@ def strip(bv: str, dry: bool = False) -> int:
         if raw != text:
             n += cnt
             if not dry:
-                p.write_text(raw, encoding="utf-8")
+                write_atomic(p, raw)
     if n:
         print(f"收回 {n} 处旧注解{'（演练）' if dry else ''}")
     return n
@@ -145,12 +145,12 @@ def annotate(bv: str, dry: bool = False) -> int:
         for end, text in sorted(inserts, reverse=True):
             raw = raw[:end] + text + raw[end:]
         if not dry:
-            path.write_text(raw, encoding="utf-8")
+            write_atomic(path, raw)
         total += len(inserts)
         print(f"  {path.name}: 补 {len(inserts)} 处 → {', '.join(t.strip('（）')[:16] for _, t in inserts)}")
     if not dry:
         stamp = OUT / bv / "annotate.json"
-        stamp.write_text(json.dumps({"count": total}, ensure_ascii=False), encoding="utf-8")
+        write_atomic(stamp, json.dumps({"count": total}, ensure_ascii=False))
     print(f"\n共补 {total} 处注解{'（演练，未写入）' if dry else ''}")
     return total
 

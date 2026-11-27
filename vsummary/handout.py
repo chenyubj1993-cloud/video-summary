@@ -5,6 +5,8 @@
 """
 from __future__ import annotations
 
+from .core import write_atomic
+
 import argparse
 import html as H
 import json
@@ -605,7 +607,7 @@ def main() -> None:
 
     doc = inline_images(doc, out)
     hp = out / "讲义.html"
-    hp.write_text(doc, encoding="utf-8")
+    write_atomic(hp, doc)
 
     md = [f"# {title} 视频讲义", "",
           f"> UP：{seg['owner']}　|　{bv}　|　{len(seg['parts'])} {unit}　|　"
@@ -613,7 +615,7 @@ def main() -> None:
           "---", "", "\n\n---\n\n".join(mdparts), "", "---", "", appx_m,
           ""]
     mp = out / "讲义.md"
-    mp.write_text("\n".join(md), encoding="utf-8")
+    write_atomic(mp, "\n".join(md))
 
     print(f"已写 {hp}  ({hp.stat().st_size/1024:.0f} KB)")
     print(f"已写 {mp}  ({mp.stat().st_size/1024:.0f} KB)")

@@ -19,7 +19,7 @@ import json
 import re
 from collections import defaultdict
 
-from .core import GLOSSARY, load_segments, OUT, read_lines, seg_text
+from .core import GLOSSARY, load_segments, OUT, read_lines, seg_text, write_atomic
 
 CJK = r"\u4e00-\u9fff"
 LEAD = re.compile(r"^(?:但是|所以|那么|然后|因为|而且|就是|其实|这个|那个|我们|大家|"
@@ -624,7 +624,7 @@ def main() -> None:
         (OUT / args.bv / "claims.md").write_text(
             render_md(args.bv, data["claims"], rows, len(before)), encoding="utf-8")
         data["conflicts"] = rows
-        cache.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
+        write_atomic(cache, json.dumps(data, ensure_ascii=False, indent=1))
         print(f"过滤通用主体：{len(before)} → {len(rows)} 组")
         for r in rows[: args.top]:
             print(f"[{r['kind']}] {r['subject']}: {r['a']['value']} vs {r['b']['value']}")
