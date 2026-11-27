@@ -11,7 +11,7 @@ import json
 import re
 from pathlib import Path
 
-from vsummary.core import GLOSSARY, OUT, fmt, link, load_segments, seg_text
+from vsummary.core import fmt, GLOSSARY, link, load_segments, OUT, read_lines, read_text, seg_text
 from vsummary import cite
 
 CSS = """
@@ -300,7 +300,7 @@ def build_appendix(bv: str, info: dict) -> tuple[str, str]:
 
     rules = []
     for f in sorted(GLOSSARY.glob("*.tsv")) + sorted(GLOSSARY.glob("series/*.tsv")):
-        for line in open(f, encoding="utf-8"):
+        for line in read_lines(f):
             if line.strip() and not line.lstrip().startswith("#"):
                 c = line.rstrip("\n").split("\t")
                 if len(c) >= 4 and c[3].strip() == "obs":
@@ -325,7 +325,7 @@ def build_appendix(bv: str, info: dict) -> tuple[str, str]:
     ch = OUT / bv / "changes.md"
     n_fix = 0
     if ch.exists():
-        n_fix = sum(1 for line in open(ch, encoding="utf-8") if line.startswith("- **P"))
+        n_fix = sum(1 for line in read_lines(ch) if line.startswith("- **P"))
     h += ['<h1 id="appx-quality">附录 C　这份转写是怎么来的</h1>',
           '<div class="callout"><b>请你先知道三件事，再相信正文里的任何一句话。</b></div>',
           "<ul>",
@@ -521,7 +521,7 @@ def main() -> None:
     cite_ok = cite_n = 0
     slug_seen: dict = {}
     for f in chs:
-        text = open(f, encoding="utf-8").read()
+        text = read_text(f)
         body, toc = md_to_html(text, slug_seen)
         body, rows = cite.annotate_html(bv, body)
         ok, n = cite.stats(rows)

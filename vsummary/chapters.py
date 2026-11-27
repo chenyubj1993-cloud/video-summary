@@ -284,7 +284,7 @@ def strip_fence(text: str) -> str:
     """模型有时把整章包在 ```markdown 里，这会毁掉标题与后续 section 判定。"""
     t = text.strip()
     m = re.match(r"^```[A-Za-z]*\s*\n(.*?)\n```\s*$", t, flags=re.S)
-    if m and "\n## " in m.group(1):
+    if m and m.group(1).lstrip().startswith("#"):
         return m.group(1).strip()
     return t
 

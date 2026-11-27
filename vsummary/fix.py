@@ -13,7 +13,7 @@ import json
 import os
 import re
 
-from vsummary.core import GLOSSARY, OUT, domain_of, load_segments, write_atomic
+from vsummary.core import domain_of, GLOSSARY, load_segments, OUT, read_lines, write_atomic
 
 DOMAIN_FILE = {"人工智能与机器学习": "ai", "计算机视觉": "cv", "编程与软件工程": "dev",
                "数学": "math", "医学与健康": "med", "法律": "law",
@@ -33,7 +33,7 @@ def load_rules(paths: list[str]) -> list[dict]:
     for p in paths:
         if not os.path.exists(p):
             continue
-        for line in open(p, encoding="utf-8-sig"):     # 词表可能被记事本存成 BOM
+        for line in read_lines(p, "utf-8-sig"):     # 词表可能被记事本存成 BOM
             line = line.rstrip("\n")
             if not line.strip() or line.lstrip().startswith("#"):
                 continue

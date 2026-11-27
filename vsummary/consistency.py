@@ -35,12 +35,10 @@ RULES = [
 ]
 DIM = re.compile(r"(?<![\d.])(\d{1,5})\s*[×xX*乘]\s*(\d{1,6})(?![\d.])")
 
-CUT = "。！？；\n，,、：:"
 NOUNS = ["memory bank", "batch size", "输入序列", "序列长度", "特征", "向量", "logits",
          "encoder", "decoder", "队列", "block", "patch", "词表", "图像块", "图像", "序列",
          "模型", "样本", "类别", "维度", "head", "token", "tokens", "损失", "label", "标签"]
 LOW_CARD = {a for a, _, _, low in RULES if low} | {"维度对"}
-ATTR_OF_RULE = {r[0] for r in RULES}
 
 
 @dataclass

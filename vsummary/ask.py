@@ -16,7 +16,7 @@ import math
 import re
 from collections import Counter
 
-from .core import GLOSSARY, OUT, fmt, link, load_segments, seg_text
+from .core import fmt, GLOSSARY, link, load_segments, OUT, read_lines, seg_text
 
 TOKEN = re.compile(r"[A-Za-z][A-Za-z0-9_.+#-]*|\d+(?:\.\d+)?|[\u4e00-\u9fff]+")
 STOP = set("的了是在和就都而及与这那你我他它们有会要可以不过而且对于所以因为如果就是没有"
@@ -110,7 +110,7 @@ def alias_map() -> dict[str, set[str]]:
     p = GLOSSARY / "terms" / "ai.tsv"
     if not p.exists():
         return amap
-    for line in open(p, encoding="utf-8"):
+    for line in read_lines(p):
         line = line.strip()
         if not line or line.startswith("#"):
             continue
@@ -129,13 +129,6 @@ def expand(query: str, amap: dict[str, set[str]]) -> str:
         if form and form in low:
             extra.extend(x for x in forms if x.lower() not in low)
     return query + " " + " ".join(sorted(set(extra))) if extra else query
-
-
-def context(lines: list[dict], idx: int, span: int = 1) -> list[int]:
-    """把命中句前后各 span 句一起带上，避免断章取义。"""
-    same = [j for j in range(max(0, idx - span), min(len(lines), idx + span + 1))
-            if lines[j]["page"] == lines[idx]["page"]]
-    return same
 
 
 def answer(bv: str, question: str, top: int = 6, use_llm: bool = True) -> dict:

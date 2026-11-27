@@ -35,9 +35,6 @@ def _han(text: str) -> int:
     return len(re.findall(r"[\u4e00-\u9fff]", text))
 
 
-DENSE = ("人工智能", "计算机视觉", "编程", "数学", "医学", "法律", "金融")
-
-
 def _need_chapters(minutes: float) -> int:
     """一节 20 分钟的片子不需要 3 章。"""
     if minutes < 30:

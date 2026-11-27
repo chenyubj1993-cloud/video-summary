@@ -19,7 +19,7 @@ import json
 import re
 from collections import defaultdict
 
-from .core import GLOSSARY, OUT, load_segments, seg_text
+from .core import GLOSSARY, load_segments, OUT, read_lines, seg_text
 
 CJK = r"\u4e00-\u9fff"
 LEAD = re.compile(r"^(?:但是|所以|那么|然后|因为|而且|就是|其实|这个|那个|我们|大家|"
@@ -527,7 +527,7 @@ def write_glossary(bv: str, rows: list[dict]) -> list[dict]:
     p = GLOSSARY / "_discovered.tsv"
     seen: set[tuple[str, str]] = set()
     if p.exists():
-        for line in open(p, encoding="utf-8"):
+        for line in read_lines(p):
             if not line.strip() or line.startswith("#"):
                 continue
             c = line.split("\t")

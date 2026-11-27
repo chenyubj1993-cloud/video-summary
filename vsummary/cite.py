@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import re
 
-from .core import link, load_segments
+from .core import link, load_segments, read_text
 
 PAT = re.compile(r"\[P\s*(\d{1,3})\s*[·:：]?\s*(?:(\d{1,2}):)?(\d{1,2}):(\d{2})\]")
 TOL = 15.0          # 允许的秒级误差
@@ -104,7 +104,7 @@ def main() -> None:
         raise SystemExit(f"{d} 里没有 ch*.md")
     total_ok = total = 0
     for f in files:
-        text = open(f, encoding="utf-8").read()
+        text = read_text(f)
         rows = verify(args.bv, text)
         ok, n = stats(rows)
         total_ok += ok

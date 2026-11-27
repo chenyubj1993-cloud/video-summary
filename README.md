@@ -17,12 +17,12 @@
 | 产物 | 内容 | 规模 |
 |---|---|---|
 | `讲义.html` | **最终交付物**：单文件、侧边目录、图片内嵌、可直接打印成 PDF | 1.3 MB / 111 页 |
-| `讲义.md` | 同一份内容的 Markdown | 35,844 汉字 |
-| `精简版.html` / `.md` | 复习稿：一页地图 + 十条总纲 + 每章核心结论/概念表/数字/易错点 | 4,485 汉字，约 15 分钟读完 |
-| `全课转写_已纠错.md` | 全文，每句带 `?p=N&t=秒` 深链，点开跳到视频那一秒 | 156,653 字 |
-| `changes.md` | 每一处纠错的「改前 → 改后」，可逐条核对 | 273 处 |
+| `讲义.md` | 同一份内容的 Markdown | 38,995 汉字 |
+| `精简版.html` / `.md` | 复习稿：一页地图 + 十条总纲 + 每章核心结论/概念表/数字/易错点 | 4,327 汉字，约 15 分钟读完 |
+| `全课转写_已纠错.md` | 全文，每句带 `?p=N&t=秒` 深链，点开跳到视频那一秒 | 123,105 汉字（含时间码共 156,653 字） |
+| `changes.md` | 每一处纠错的「改前 → 改后」，可逐条核对 | 307 处 |
 | `总览.md` | 目录 + 40 篇逐 P 摘要 | 100 KB |
-| `板书.md` | 抽帧 + OCR 得到的画面文字（PPT 公式、代码） | 180 帧 |
+| `板书.md` | 抽帧 + OCR 得到的画面文字（PPT 公式、代码） | 446 帧 |
 | `prereq.md` / `termsheet.md` | 前置顺序体检 / 名词速查表 | — |
 
 讲义自带 6 个附录：分P 索引、术语纠错表、转写来历、前后不一致清单、画面文字、名词速查；正文含 15 张画面图、28 道自测题。
@@ -33,21 +33,34 @@
 
 ```bat
 :: 1. 依赖
-python -m pip install -r requirements.txt
+python -m venv .venv
+.venv\Scripts\python -m pip install -r requirements.txt
 
-:: 2. 模型（约 1.5GB，从镜像下）
-curl -L -o models\faster-whisper-large-v3-turbo\model.bin ^
-  https://hf-mirror.com/mobiuslabsgmbh/faster-whisper-large-v3-turbo/resolve/main/model.bin
-:: 同目录还要 tokenizer.json / vocabulary.json / config.json / preprocessor_config.json
-::（文件清单见 docs/方案总结.md「模型准备」）
+:: 2. GPU 加速（有 NVIDIA 卡就装，不用 CUDA Toolkit、不用管理员）
+::    不装也能跑，但转写会退回 CPU：6.9 小时的课 13 分钟 vs 2 小时
+.venv\Scripts\python -m pip install nvidia-cublas-cu12 nvidia-cudnn-cu12 nvidia-cuda-nvrtc-cu12
 
-:: 3. 大模型 key（任一 OpenAI 兼容接口；只用本地 Ollama 就随便填）
+:: 3. 模型（约 1.55GB，从镜像下；文件夹名必须完全一致）
+set M=https://hf-mirror.com/mobiuslabsgmbh/faster-whisper-large-v3-turbo/resolve/main
+set D=models\faster-whisper-large-v3-turbo
+mkdir %D%
+curl -L -o %D%\model.bin              %M%/model.bin
+curl -L -o %D%\tokenizer.json         %M%/tokenizer.json
+curl -L -o %D%\vocabulary.json        %M%/vocabulary.json
+curl -L -o %D%\config.json            %M%/config.json
+curl -L -o %D%\preprocessor_config.json %M%/preprocessor_config.json
+
+:: 4. 大模型 key（任一 OpenAI 兼容接口；只用本地 Ollama 就随便填）
 set OPENAI_API_KEY=sk-...
 
-:: 4. 跑
-python cli.py all BV1E9U8BBEvZ --dry-run    :: 先看它打算干什么
+:: 5. 先自检，再跑
+python cli.py check
+python cli.py all BV1E9U8BBEvZ --dry-run    :: 只看它打算干什么
 python cli.py all BV1E9U8BBEvZ              :: 开跑
 ```
+
+`check` 会告诉你缺什么：模型有没有、GPU 能不能真用、词表几条。
+如果输出里出现「看得到 GPU 但没装 CUDA 运行库」，说明第 2 步没做，转写会慢 8 倍。
 
 跑完看 `out/BV1E9U8BBEvZ/讲义.html`。
 
@@ -111,7 +124,7 @@ python cli.py all "【多模态教程】https://www.bilibili.com/video/BV1E9U8BB
 | `frames BV号 --pages 5,14` | 抽帧 + OCR，补画面里的板书 | — |
 | `coldstart BV号` | 自动猜听错的英文专名（只出候选） | — |
 | `harvest BV号` | 从摘要里反向挖候选误听对 | — |
-| `test` | 跑单元测试（18 例，不需要网络/GPU/key） | — |
+| `test` | 跑单元测试（62 例，不需要网络/GPU/key） | — |
 | `check` | 自检环境：目录、模型、CUDA、词表 | — |
 
 ### 断点续跑
@@ -324,7 +337,7 @@ python cli.py all "https://www.bilibili.com/video/BVxxxxxxx" --dry-run
 |---|---|
 | 转写 | large-v3-turbo fp16，28–32x 实时（6.92h → 13 分钟），字级准确率约 99.9% |
 | 纠错 | 47 条 obs 规则，命中 273 处 |
-| 讲义 | 7 章、35,844 汉字、931 处出处全部核对到原文、15 张图、28 道题、111 页 PDF |
+| 讲义 | 7 章、38,995 汉字、931 处出处全部核对到原文、15 张图、28 道题、111 页 PDF |
 | 精简版 | 4,327 汉字（原稿的 12%），约 14 分钟读完 |
 | 书稿密度 | 39 → 86 字/音频分钟（教材区间 60–100，讲稿 200–300） |
 | 成本 | 全流程约 61 万 tokens ≈ ¥1；精简版另加 4 万 |

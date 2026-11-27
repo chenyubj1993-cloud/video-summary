@@ -148,10 +148,5 @@ def meta(bv: str) -> dict:
     }
 
 
-def canonical_url(bv: str, page: int | None = None) -> str:
-    q = f"?p={page}" if page else ""
-    return f"https://www.bilibili.com/video/{bv}{q}"
-
-
 def quote(s: str) -> str:
     return urllib.parse.quote(s)

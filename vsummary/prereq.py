@@ -16,7 +16,7 @@ from __future__ import annotations
 import argparse
 import re
 
-from .core import GLOSSARY, OUT
+from .core import GLOSSARY, OUT, read_lines
 
 CODE = re.compile(r"```.*?```", re.S)
 CITE = re.compile(r"\[P\s*\d{1,2}[^\]]*\]")
@@ -64,7 +64,7 @@ def load_terms() -> dict[str, dict]:
     deleted: set[str] = set()
     ov = GLOSSARY / "terms_override.tsv"
     if ov.exists():
-        for line in open(ov, encoding="utf-8-sig"):
+        for line in read_lines(ov, "utf-8-sig"):
             if not line.strip() or line.startswith("#"):
                 continue
             c = line.rstrip("\n").split("\t")
@@ -75,7 +75,7 @@ def load_terms() -> dict[str, dict]:
         if not f.exists():
             continue
         override = f.name == "terms_override.tsv"
-        for line in open(f, encoding="utf-8-sig"):
+        for line in read_lines(f, "utf-8-sig"):
             if not line.strip() or line.startswith("#"):
                 continue
             c = line.rstrip("\n").split("\t")

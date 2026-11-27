@@ -161,3 +161,14 @@ def domain_of(bv: str) -> list[str]:
     if not p.exists():
         return []
     return [d["domain"] for d in json.load(open(p, encoding="utf-8"))["top3"]]
+
+
+def read_text(path, enc: str = "utf-8") -> str:
+    """读文本文件；编码显式给出，避免 Windows 默认 GBK 带来的乱码。"""
+    with open(path, encoding=enc) as f:
+        return f.read()
+
+
+def read_lines(path, enc: str = "utf-8") -> list[str]:
+    with open(path, encoding=enc) as f:
+        return f.readlines()

@@ -106,14 +106,24 @@ def main() -> None:
         return WhisperModel(str(MODELS / args.model), device=device, compute_type=ctype,
                             cpu_threads=min(16, os.cpu_count() or 8))
 
+    def probe(m, device: str) -> None:
+        """真跑一次 0.6 秒静音：能数到 GPU 不等于能用 GPU（缺 cublas 就崩在推理时）。"""
+        import numpy as np
+        segs, _ = m.transcribe(np.zeros(9600, dtype=np.float32), language="zh",
+                               beam_size=1, vad_filter=False)
+        for _ in segs:          # 转写是生成器，必须消费才会真正执行
+            pass
+
     device, ctype = ("cpu", "int8") if args.device == "cpu" else ("cuda", "float16")
     try:
         model = build(device, ctype)
-        if device == "cuda":
-            import ctranslate2
-            ctranslate2.get_cuda_device_count()  # 触发一次加载，暴露缺 DLL 的问题
+        probe(model, device)
     except Exception as e:
-        print(f"[warn] {device}/{ctype} 不可用（{e}），回落 CPU int8", flush=True)
+        if device == "cpu":
+            sys.exit(f"[err] CPU 转写也起不来：{e}")
+        print(f"[warn] {device}/{ctype} 不可用（{e}）", flush=True)
+        print("[warn] 回落 CPU int8（慢 8 倍）。想要 GPU："
+              "pip install nvidia-cublas-cu12 nvidia-cudnn-cu12 nvidia-cuda-nvrtc-cu12", flush=True)
         device, ctype = "cpu", "int8"
         model = build(device, ctype)
     print(f"[model] {args.model} on {device}/{ctype}", flush=True)

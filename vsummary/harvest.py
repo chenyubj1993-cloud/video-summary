@@ -10,7 +10,7 @@ import glob
 import re
 from collections import Counter
 
-from vsummary.core import GLOSSARY, OUT, load_segments, seg_text
+from vsummary.core import GLOSSARY, load_segments, OUT, read_lines, seg_text
 
 PAT = re.compile(r'([A-Za-z0-9\+\-\.\u4e00-\u9fa5]{1,24})\s*[（(]\s*转写(?:为|成|成了|为是)?'
                  r'\s*[“"\']([^”"\']{1,24})[”"\']\s*[)）]')
@@ -24,7 +24,7 @@ def main() -> None:
 
     pairs: Counter[str] = Counter()
     for f in sorted(glob.glob(str(out / "summaries" / "*.md"))):
-        for line in open(f, encoding="utf-8"):
+        for line in read_lines(f):
             if "关键术语" not in line:
                 continue
             for good, bad in PAT.findall(line):

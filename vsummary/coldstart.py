@@ -20,7 +20,7 @@ import difflib
 import re
 from collections import Counter
 
-from .core import GLOSSARY, load_segments, seg_text
+from .core import GLOSSARY, load_segments, read_lines, seg_text
 
 LEXICON = GLOSSARY / "terms" / "ai.tsv"
 FENCE = re.compile(r"[\u4e00-\u9fff]")
@@ -67,7 +67,7 @@ def load_lexicon() -> tuple[dict[str, str], set[str]]:
     alias: dict[str, str] = {}
     if not LEXICON.exists():
         return alias, set()
-    for line in open(LEXICON, encoding="utf-8"):
+    for line in read_lines(LEXICON):
         line = line.strip()
         if not line or line.startswith("#"):
             continue
@@ -166,7 +166,7 @@ def existing_rules() -> set[tuple[str, str]]:
     """现有词表里已生效（obs）的 (规范词, 误听形)。"""
     out = set()
     for f in list(GLOSSARY.glob("*.tsv")) + list(GLOSSARY.glob("series/*.tsv")):
-        for line in open(f, encoding="utf-8"):
+        for line in read_lines(f):
             if not line.strip() or line.lstrip().startswith("#"):
                 continue
             c = line.rstrip("\n").split("\t")

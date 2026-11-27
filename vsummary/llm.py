@@ -117,9 +117,3 @@ class LLM:
         return f"{self.calls} 次调用{tok}"
 
 
-def from_args(args) -> LLM:
-    """从 argparse 的通用三件套构造客户端。"""
-    return LLM(base=getattr(args, "api_base", None),
-               key=getattr(args, "api_key", None),
-               model=getattr(args, "model", None),
-               temperature=getattr(args, "temperature", 0.2))

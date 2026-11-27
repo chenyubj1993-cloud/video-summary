@@ -21,7 +21,7 @@ import time
 from pathlib import Path
 
 from vsummary import cite
-from vsummary.core import OUT, WORK, load_segments, video_info
+from vsummary.core import load_segments, OUT, read_lines, video_info, WORK
 
 AUDIO_EXT = (".m4a", ".mp3", ".webm", ".aac", ".flac", ".ogg", ".wav")
 
@@ -39,11 +39,6 @@ def newest(*paths) -> float:
             elif q.is_dir():
                 t = max([t] + [f.stat().st_mtime for f in q.rglob("*") if f.is_file()])
     return t
-
-
-def oldest(paths) -> float:
-    ts = [Path(p).stat().st_mtime for p in paths if Path(p).is_file()]
-    return min(ts) if ts else 0.0
 
 
 # ------------------------------------------------------------------ 阶段
@@ -84,7 +79,7 @@ def ch_summarize(bv: str, ctx: dict) -> tuple[bool, str]:
         return False, "没有 summaries/"
     pages = set()
     for f in d.glob("*.md"):
-        for line in open(f, encoding="utf-8"):
+        for line in read_lines(f):
             if line.startswith("## P"):
                 pages.add(int(line[4:6]))
     return len(pages) >= ctx["n_parts"], f"{len(pages)}/{ctx['n_parts']} 篇"

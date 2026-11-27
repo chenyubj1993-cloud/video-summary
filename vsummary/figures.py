@@ -100,7 +100,7 @@ def save(frame: dict, dest: Path, width: int = 900) -> bool:
 
 
 def nearest_cite(text: str, page: int, t: float, tol: float = 30.0):
-    """同分P、时间最近的引用 → (位置, 段尾位置) """
+    """同分P、时间最近的引用 → 插入位置（该引用所在段落的段尾）；找不到返回 None。"""
     best = None
     for m in CITE.finditer(text):
         p, mm, ss = int(m.group(1)), int(m.group(2)), int(m.group(3))

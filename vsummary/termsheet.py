@@ -22,7 +22,6 @@ from .prereq import load_terms, read_chapters
 OVERRIDE = GLOSSARY / "terms_override.tsv"
 
 CUE = r"(?:是指|指的是|定义为|定义是|全称为|全称是|称为|叫做|即|所谓)"
-WEAK = r"(?:是|表示|指)"
 BAD_HEAD = ("我们", "这个", "那个", "大家", "下面", "接下来", "然后", "所以", "它")
 MAXLEN = 48
 

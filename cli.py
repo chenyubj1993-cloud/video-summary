@@ -11,6 +11,8 @@
 """
 from __future__ import annotations
 
+from vsummary.core import read_lines
+
 import importlib
 import sys
 
@@ -95,14 +97,18 @@ def check() -> None:
     print(f"  CUDA DLL  : {len(dirs)} 个 nvidia bin 目录")
     try:
         import ctranslate2
-        print(f"  ctranslate2: {ctranslate2.__version__}，可见 GPU {ctranslate2.get_cuda_device_count()}")
+        n_gpu = ctranslate2.get_cuda_device_count()
+        print(f"  ctranslate2: {ctranslate2.__version__}，可见 GPU {n_gpu}")
+        if n_gpu and not dirs:
+            print("              ⚠ 看得到 GPU 但没装 CUDA 运行库，转写会退回 CPU（慢 8 倍）。")
+            print("                装一行就好：pip install nvidia-cublas-cu12 nvidia-cudnn-cu12 nvidia-cuda-nvrtc-cu12")
     except Exception as e:
         print(f"  ctranslate2: 不可用（{e}）")
 
     for f in ("common.tsv", "ai.tsv"):
         p = GLOSSARY / f
         if p.exists():
-            n = sum(1 for line in open(p, encoding="utf-8")
+            n = sum(1 for line in read_lines(p)
                     if line.strip() and not line.lstrip().startswith("#"))
             print(f"  词表 {f:<9}: {n} 条")
 
