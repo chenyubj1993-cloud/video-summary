@@ -164,12 +164,15 @@ def build(bv: str, llm: LLM, only: set[int] | None = None) -> str:
     full_han = len(re.findall(r"[\u4e00-\u9fff]", full_txt))
     n_fig = full_txt.count("![图 ")
     n_q = full_txt.count("答案</summary>") or full_txt.count("<summary>答案")
+    omni_txt = omni.strip()
+    han_omni = len(re.findall(r"[\u4e00-\u9fff]", omni_txt))
+    total = han + han_omni
     md = (f"# 精简版\n\n"
-          f"> {len(chs)} 章正文压成 {han} 个汉字，约 {han / 300:.0f} 分钟读完"
+          f"> {len(chs)} 章正文 {han} 个汉字；连「一页地图」与「十条总纲」共 {total} 个汉字，约 {total / 300:.0f} 分钟读完"
           f"（完整讲义 {full_han:,} 字、{n_fig} 张画面图、{n_q} 道自测题，要细节回那里查）。\n>\n"
           f"> 建议顺序：先读「一页地图」和「十条总纲」（3 分钟建立框架），"
           f"再挑你关心的章看核心结论；每条的 `[Pxx mm:ss]` 都能跳回原视频那一秒。\n\n"
-          f"{omni.strip()}\n\n---\n\n{body_md}\n")
+          f"{omni_txt}\n\n---\n\n{body_md}\n")
     md = normalize(md)
     write_atomic(p_old, md)
     print(f"→ {p_old}")

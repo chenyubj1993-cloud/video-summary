@@ -14,6 +14,19 @@
 
 ---
 
+## 先看一眼成品
+
+<p align="center">
+  <img src="docs/screenshots/handout.png" width="620" alt="讲义正文：侧边目录、四段式小节、每句带时间码出处">
+  <img src="docs/screenshots/brief.png" width="330" alt="精简版：一页地图 + 十条总纲">
+</p>
+
+左边是讲义正文（111 页，侧边目录、每个论断后面跟着 `[P03 04:12]` 这样的出处，点一下跳回原片那一秒）；右边是精简版（一页地图 + 十条总纲 + 每章六块）。
+
+不用先跑一遍也能看成品：[**Releases**](https://github.com/chenyubj1993-cloud/video-summary/releases) 里放了这台机器跑出来的 `讲义.html`、`讲义.pdf`、`精简版.md`。
+
+---
+
 ## 它产出什么
 
 跑完一集 7 小时的 40 分P 课程（BV1E9U8BBEvZ，多模态视觉大模型），`out/BV1E9U8BBEvZ/` 下会有：
