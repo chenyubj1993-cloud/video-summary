@@ -53,6 +53,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(prog="cli.py transcribe")
     ap.add_argument("--bv", required=True)
     ap.add_argument("--no-dl", action="store_true", help="不下载，直接用 work/<bv>/ 里已有音频")
+    ap.add_argument("--dl-only", action="store_true", help="只下载音频，不转写（all 的第一阶段用这个）")
     ap.add_argument("--parts", default="", help="只转写这些分P，如 1,2,3")
     ap.add_argument("--model", default=DEFAULT_MODEL)
     ap.add_argument("--device", default="auto", choices=["auto", "cuda", "cpu"])
@@ -96,6 +97,9 @@ def main() -> None:
     todo = [(i, pages[i - 1]) for i in sorted(files) if only is None or i in only]
     if not todo:
         sys.exit(f"[err] 没有可转写的分P（音频编号与分P 对不上，清一下 {work} 重下）")
+    if args.dl_only:
+        print(f"[done] 音频已就绪：{len(todo)} 个分P → {work}（--dl-only，不转写）", flush=True)
+        return
     print(f"[plan] 待转写 {len(todo)} 个分P", flush=True)
 
     enable_cuda()

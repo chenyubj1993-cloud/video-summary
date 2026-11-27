@@ -49,7 +49,7 @@ USAGE = """用法：python cli.py <命令> [参数]
   all        BV号 [--dry-run] [--from 阶段] [--only a,b] [--no-llm] [--force]
                  阶段：download transcribe classify fix summarize overview consistency chapters
                        termsheet annotate exercises figures prereq handout gate
-  transcribe --bv BV号 [--no-dl] [--parts 1,2] [--device auto|cuda|cpu]
+  transcribe --bv BV号 [--no-dl | --dl-only] [--parts 1,2] [--device auto|cuda|cpu]
   classify   BV号
   fix        BV号 [--emit]
   harvest    BV号

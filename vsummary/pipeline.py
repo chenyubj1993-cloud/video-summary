@@ -214,7 +214,7 @@ def ch_handout(bv: str, ctx: dict) -> tuple[bool, str]:
 
 
 STAGES = [
-    ("download",   ch_download,   False, ["transcribe", "--bv", "{bv}"]),
+    ("download",   ch_download,   False, ["transcribe", "--bv", "{bv}", "--dl-only"]),
     ("transcribe", ch_transcribe, False, ["transcribe", "--bv", "{bv}", "--no-dl"]),
     ("classify",   ch_classify,   False, ["classify", "{bv}"]),
     ("fix",        ch_fix,        False, ["fix", "{bv}", "--emit"]),

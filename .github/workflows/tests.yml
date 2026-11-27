@@ -1,0 +1,33 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  unit:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ["3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      # 单测不碰模型、不联网、不需要 key；只装 import 时真正要用的那几个包。
+      # 完整依赖（faster-whisper / av / rapidocr）留给真正跑流水线的人。
+      - name: Install test deps
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install numpy pillow markdown latex2mathml
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Byte-compile everything
+        run: python -m compileall -q vsummary cli.py
