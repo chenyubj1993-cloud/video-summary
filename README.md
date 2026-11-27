@@ -1,5 +1,9 @@
 # 视频讲义生成器
 
+![tests](https://github.com/chenyubj1993-cloud/video-summary/actions/workflows/tests.yml/badge.svg)
+![license](https://img.shields.io/badge/license-MIT-blue.svg)
+![python](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)
+
 给一个 B 站链接（或 BV 号、av 号、b23.tv 短链），在本地把它变成**一份能读、能查、能打印的中文讲义**：
 
 ```
@@ -16,16 +20,18 @@
 
 | 产物 | 内容 | 规模 |
 |---|---|---|
-| `讲义.html` | **最终交付物**：单文件、侧边目录、图片内嵌、可直接打印成 PDF | 1.3 MB / 111 页 |
-| `讲义.md` | 同一份内容的 Markdown | 38,995 汉字 |
+| `讲义.html` | **最终交付物**：单文件、侧边目录、图片内嵌、可直接打印成 PDF | 1.6 MB / 111 页 |
+| `讲义.md` | 同一份内容的 Markdown | 39,053 汉字（正文 35,844 + 6 个附录） |
 | `精简版.html` / `.md` | 复习稿：一页地图 + 十条总纲 + 每章核心结论/概念表/数字/易错点 | 约 4,500 汉字，约 15 分钟读完 |
-| `全课转写_已纠错.md` | 全文，每句带 `?p=N&t=秒` 深链，点开跳到视频那一秒 | 123,105 汉字（含时间码共 156,653 字） |
+| `全课转写_已纠错.md` | 全文，每句带 `?p=N&t=秒` 深链，点开跳到视频那一秒 | 123,105 汉字（含时间码与链接共 85.6 万字符） |
 | `changes.md` | 每一处纠错的「改前 → 改后」，可逐条核对 | 307 处 |
 | `总览.md` | 目录 + 40 篇逐 P 摘要 | 100 KB |
-| `板书.md` | 抽帧 + OCR 得到的画面文字（PPT 公式、代码） | 446 帧 |
+| `板书.md` | 抽帧 + OCR 得到的画面文字（PPT 公式、代码） | 446 段 |
 | `prereq.md` / `termsheet.md` | 前置顺序体检 / 名词速查表 | — |
 
-讲义自带 6 个附录：分P 索引、术语纠错表、转写来历、前后不一致清单、画面文字、名词速查；正文含 15 张画面图、28 道自测题。
+讲义自带 6 个附录：分P 索引、术语纠错表、转写来历、前后不一致清单、画面文字、名词速查；正文含 15 张画面图、28 道自测题、931 处时间码出处。
+
+> 上面这些是**本机一次实测**的数字。正文重跑（换模型、改 `--density`、加词表）都会让它们变，以你自己机器的 `python cli.py gate <BV>` 输出为准。
 
 ---
 
@@ -345,12 +351,13 @@ python cli.py all "https://www.bilibili.com/video/BVxxxxxxx" --dry-run
 | 项 | 数值 |
 |---|---|
 | 转写 | large-v3-turbo fp16，28–32x 实时（6.92h → 13 分钟），字级准确率约 99.9% |
-| 纠错 | 47 条 obs 规则，命中 273 处 |
-| 讲义 | 7 章、36,096 汉字正文（含附录 39,053）、931 处出处全部核对到原文、15 张图、28 道题、111 页 PDF |
+| 纠错 | 47 条 obs 规则，本片命中 307 处 |
+| 讲义 | 7 章、35,844 汉字正文（含附录 39,053）、931 处出处全部核对到原文、15 张图、28 道题、111 页 PDF |
 | 精简版 | 约 4,500 汉字（原稿的 12%），约 15 分钟读完 |
 | 书稿密度 | 39 → 86 字/音频分钟（教材区间 60–100，讲稿 200–300） |
 | 成本 | 全流程约 61 万 tokens ≈ ¥1；精简版另加 4 万 |
 | 端到端 | 约 40 分钟（转写 13 分钟 + 抽帧 OCR 可与其它步骤并行） |
+| 测试 | 63 个单元测试；CI 跑 ubuntu/windows × Python 3.11/3.12 |
 
 同一段 300 秒音频的速度对照：CPU small int8 3.5x、CPU medium int8 1.1x、GPU medium fp16 13x、GPU turbo fp16 28.9x。
 
@@ -390,7 +397,7 @@ python cli.py all "https://www.bilibili.com/video/BVxxxxxxx" --dry-run
 过程中修掉的三个"陌生人一定撞上"的问题：
 
 - **GPU 探测误判**：原来用 `ctranslate2.get_cuda_device_count()` 判断——它只数设备、不加载 cublas，于是"看得到卡但没装运行库"时会选 `cuda/float16`，在第一次推理崩掉，报 `Library cublas64_12.dll is not found`。现在改为**真跑 0.6 秒静音**探测，失败自动回落 CPU 并打印装包命令。
-- **模型没下载时报错看不懂**：faster-whisper 会把路径当成模型规格名，抛 `ValueError: Invalid model size 'D:\...\faster-whisper-large-v3-turbo'`。现在先检查目录，缺就列出 `models/` 里现有的、指向 README 第 3 步。
+- **模型没下载时报错看不懂**：faster-whisper 会把路径当成模型规格名，抛 `ValueError: Invalid model size '<你的 models 目录>/faster-whisper-large-v3-turbo'`。现在先检查目录，缺就列出 `models/` 里现有的、指向 README 第 3 步。
 - **README 的模型下载只给了 `model.bin`**，另外四个文件（`tokenizer.json`/`vocabulary.json`/`config.json`/`preprocessor_config.json`）只说"同目录还要"，而指向的 `docs/方案总结.md` 里并没有那一节——等于断链。现在五个 `curl` 全给。
 
 ---

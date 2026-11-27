@@ -1,6 +1,6 @@
 """共享底座：路径、B站 API、音频解码、GPU 初始化、分段读取。
 
-所有模块都从这里取常量，不再各自写死 D:\\video_summary。
+所有模块都从这里取常量（ROOT 由本文件位置反推），不再各自写死绝对路径。
 """
 from __future__ import annotations
 
