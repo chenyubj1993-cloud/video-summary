@@ -323,7 +323,7 @@ python cli.py chapters BV1E9U8BBEvZ --only 3 --force      :: 强制重写第 3 �
 python cli.py test
 ```
 
-62 个用例（三个文件）：`tests/test_core.py` 覆盖输入解析、分章切分、出处解析、掩码、检索排序、门槛判定等纯逻辑；`tests/test_fixes.py` 是回归用例，钉住这一轮修掉的 bug——词表规则的大小写与词边界、`718` 不误伤 `1718`、BOM、`consistency` 除零、`claims` 缺字段不默认保留、附录 slug 全篇唯一、行内代码别当公式、`brief --only` 不丢其它章；`tests/test_outputs.py` 覆盖输出层——MathML 渲染、代码块不被当公式、跨章 slug 唯一、`nearest_cite` 只认同分P、`mask` 等长替换、`termsheet` 折叠 `A（A）`。全部离线、几毫秒出结果，CI 里跑（`.github/workflows/tests.yml`，ubuntu + windows × py3.11/3.12，只装 4 个轻依赖）。
+63 个用例（三个文件）：`tests/test_core.py` 覆盖输入解析、分章切分、出处解析、掩码、检索排序、门槛判定等纯逻辑；`tests/test_fixes.py` 是回归用例，钉住这一轮修掉的 bug——词表规则的大小写与词边界、`718` 不误伤 `1718`、BOM、`consistency` 除零、`claims` 缺字段不默认保留、附录 slug 全篇唯一、行内代码别当公式、`brief --only` 不丢其它章；`tests/test_outputs.py` 覆盖输出层——MathML 渲染、代码块不被当公式、跨章 slug 唯一、`nearest_cite` 只认同分P、`mask` 等长替换、`termsheet` 折叠 `A（A）`。全部离线、几毫秒出结果，CI 里跑（`.github/workflows/tests.yml`，ubuntu + windows × py3.11/3.12，只装 4 个轻依赖）。
 
 ## 只想看代码，不想跑
 

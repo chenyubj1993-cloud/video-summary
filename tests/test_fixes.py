@@ -116,5 +116,24 @@ class TestPrereq(unittest.TestCase):
         self.assertNotIn("残差", {v["name"] for v in terms.values()})
 
 
+class TestStdio(unittest.TestCase):
+    """Windows 控制台默认 cp1252/cp437：打印「→」或中文不能把程序带崩。
+
+    run.cmd 会 chcp 65001，但用户直接在 cmd 里敲 `python cli.py ...` 时没有这一步，
+    GitHub 的 windows-latest runner 也没有。所以 `vsummary/__init__.py` 自己把 stdio 切到 UTF-8。
+    """
+
+    def test_arrow_survives_cp1252_console(self):
+        import os
+        import subprocess
+
+        root = Path(__file__).resolve().parents[1]
+        code = "import vsummary; print('\u2192 \u4e2d\u6587')"
+        env = dict(os.environ, PYTHONIOENCODING="cp1252", PYTHONUTF8="0")
+        r = subprocess.run([sys.executable, "-c", code], cwd=str(root), capture_output=True,
+                           timeout=120, env=env)
+        self.assertEqual(r.returncode, 0, r.stderr.decode("utf-8", "replace")[-400:])
+
+
 if __name__ == "__main__":
     unittest.main()
